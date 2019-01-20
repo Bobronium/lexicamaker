@@ -1,0 +1,3 @@
+pytidylib >= 0.1.0
+shutil >= 1.0
+shlex >= 1.0
