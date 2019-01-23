@@ -13,7 +13,7 @@ from .context import lexicamaker
 
 
 def setup_function(function):
-    print("setting up %s" % function)
+    print("Output from %s" % function)
 
 def test_something():
     print("TEST!!!!")
@@ -28,3 +28,6 @@ def test_import():
     from lexicamaker import __main__
     assert __main__.cmd_enc()=="no"
 
+def test_import2():
+    print("TEST import 2!!!!")
+    assert __main__.cmd_enc()=="yes"
