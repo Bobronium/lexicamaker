@@ -3,6 +3,8 @@
 
 from setuptools import setup
 
+# fix the automatic versioning with __version__ from __init__.py
+
 setup(name='lexicamaker',
   version='0.1.2',
   description='DSL to Apple Dictionary Service converter',

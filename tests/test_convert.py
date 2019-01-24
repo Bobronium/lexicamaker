@@ -25,9 +25,10 @@ def test_something_else():
 
 def test_import():
     print("TEST import!!!!")
-    from lexicamaker import __main__
-    assert __main__.cmd_enc()=="no"
+    #    from lexicamaker import __main__
+    assert lexicamaker.__version__=="0.1.2"
 
 def test_import2():
     print("TEST import 2!!!!")
+    from lexicamaker import __main__
     assert __main__.cmd_enc()=="yes"
