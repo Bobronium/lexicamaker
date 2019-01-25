@@ -23,12 +23,14 @@ def test_argparse1():
         2) %(prog) testsource/TestDictionary.dsl somedir"""
     from lexicamaker.__main__ import arguments_parser
     
-    testfile = 'testsource/TestDictionary.dsl'
-    somedir = 'somedir'
+
     os.chdir(os.path.dirname(__file__))
-    assert arguments_parser().parse_args([testfile]).dslfile.name == testfile
-    assert arguments_parser().parse_args([testfile]).dir == os.getcwd()
-    assert arguments_parser().parse_args([testfile, somedir]).dir == somedir
+    assert arguments_parser().parse_args(['path/file.dsl']).dslfile == 'path/file.dsl'
+    #assert arguments_parser().parse_args(['path/file.dsl']).outdir == 'path/file'
+    #assert arguments_parser().parse_args(['path/file.dsa']).outdir == 'path/file.dsa'
+    assert arguments_parser().parse_args(['path/file.dsl', 'adir']).outdir == 'adir'
+    #assert arguments_parser().parse_args(['path/file.dsa', 'adir']).outdir == 'adir/file.dsa'
+
 
 
 def test_argparse2():
