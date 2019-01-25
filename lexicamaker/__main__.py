@@ -1,18 +1,12 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-
-
-
-def cmd_enc():
-    return "yes"
 
 import os, sys
 import argparse
 from lexicamaker import __version__
 
-
-def main():
+def arguments_parser():
     parser = argparse.ArgumentParser(prog='adsmaker',
                                      description="Lexicamaker v%s - creates Apple Dictionary Service folder from DSL dictionary" % __version__,
                                      #usage='%(prog)s [options] DSL_FILE [OUTPUT_DIR]\n       %(prog)s [--help | --version]',
@@ -29,9 +23,13 @@ def main():
     subgroup2.add_argument('--no-media', action='store_false', help="Skip media")
     subgroup2.add_argument('--media', metavar='TYPE', type=str, help="Change media type to TYPE (supported wav, mp3, m4a)")
     parser.add_argument('--version', action='version', version="lexicamaker v%s" % __version__ ) #"%(prog)s v{}".format(__version__))
-    args = parser.parse_args()
-    print (args)
+    return parser
 
+def main():
+
+    args = arguments_parser().parse_args()
+    print (args)
+    print (args.dslfile.name)
 
 
 
