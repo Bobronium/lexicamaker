@@ -52,8 +52,6 @@ def test_argparse2():
         """
     from lexicamaker.__main__ import IOBridge
     
-
-    
     args = IOBridge(['path/file.dsl'])
     assert args.dictionaryFile == 'path/file.dsl'
     
@@ -87,3 +85,44 @@ def test_argparse3():
     args.parse_args(['path/file.dsl', 'adir'])
     assert args.outputDictionaryPath == 'adir'
     #assert args.parser.parse_args(['path/file.dsa', 'adir']).outputDictionaryPath == 'adir/file.dsa'
+
+
+def test_argparse4():
+    """Checks import of the parser function and tests the simplest argument configuration.
+        1) abbreviations and annotation are automatically found
+        2) abbreviations and annotation are explicitly given
+        3) parse arguments from ArgumentParser::parse_args
+        4) parse arguments from IOBridge::parse_args
+        5) parse arguments direct from IOBridge after parse_args
+        6) forward arguments to abstract class C using ArgumentParser::namespace
+        """
+    os.chdir(os.path.dirname(__file__))
+    
+    from lexicamaker.__main__ import IOBridge
+
+    args = IOBridge(['--remote', 'test_setparams_data/dict1.dsl'])
+    args.open_files()
+    
+    assert args.outputDictionaryPath == 'test_setparams_data/dict1'
+    assert args.dictionaryName == 'dict1'
+    assert args.dictionaryFile.name == 'test_setparams_data/dict1.dsl'
+    assert args.annotationFile.name == 'test_setparams_data/dict1.ann'
+    assert args.abbreviationsFile.name == 'test_setparams_data/dict1_abrv.dsl'
+
+    args.parse_args(['--no-annotation', '--no-abbreviations', 'test_setparams_data/dict1.dsl'])
+    args.open_files()
+    assert args.dictionaryFile.name == 'test_setparams_data/dict1.dsl'
+    assert args.annotationFile == False
+    assert args.abbreviationsFile == False
+    
+    args.parse_args(['--annotation', 'test_setparams_data/dict1.ann', '--abbreviations', 'test_setparams_data/dict1_abrv.dsl', 'test_setparams_data/dict2.dsl'])
+    args.open_files()
+    assert args.dictionaryFile.name == 'test_setparams_data/dict2.dsl'
+    assert args.annotationFile.name == 'test_setparams_data/dict1.ann'
+    assert args.abbreviationsFile.name == 'test_setparams_data/dict1_abrv.dsl'
+
+    args = IOBridge(['--remote', 'test_setparams_data/dict3.dsx'])
+    args.open_files()
+    assert args.outputDictionaryPath == 'test_setparams_data/dict3.dsx'
+    assert args.dictionaryName == 'dict3.dsx'
+    assert args.dictionaryFile.name == 'test_setparams_data/dict3.dsx'
