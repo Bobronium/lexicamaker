@@ -985,19 +985,19 @@ if entryContents == '':
 else:
     XMLfile.write(titleString + gIndexStrings + "		<div d:priority=\"2\" class=\"title\">" + gEntryTitle + "</div>" + entryContents + "\n</d:entry>\n" + "\n</d:dictionary>")
 
-makefileContents = open(os.path.dirname(os.path.realpath(sys.argv[0])) + '/MyDictionary/Makefile', 'r', encoding='utf-8').read()
+makefileContents = open(os.path.dirname(os.path.realpath(sys.argv[0])) + '/../template/Makefile', 'r', encoding='utf-8').read()
 makefileContents = re.sub('__DictionaryName__', dictionaryName, makefileContents)
 makefile.write(makefileContents)
 
-MyInfoFileContents = open(os.path.dirname(os.path.realpath(sys.argv[0])) + '/MyDictionary/MyInfo.plist', 'r', encoding='utf-8').read()
+MyInfoFileContents = open(os.path.dirname(os.path.realpath(sys.argv[0])) + '/../template/MyInfo.plist', 'r', encoding='utf-8').read()
 MyInfoFileContents = re.sub('__DictionaryName__', dictionaryName, MyInfoFileContents)
 MyInfoFileContents = re.sub('__DictionaryTitle__', dictionaryTitle, MyInfoFileContents)
 MyInfoFile.write(MyInfoFileContents)
 
-shutil.copy2(os.path.dirname(os.path.realpath(sys.argv[0])) + '/MyDictionary/MyDictionary.css', outputDictionaryPath)
-shutil.copy2(os.path.dirname(os.path.realpath(sys.argv[0])) + '/MyDictionary/padding.gif', outputDictionaryPath)
-if not os.path.exists(outputDictionaryPath + '/OtherResources'):
-    shutil.copytree(os.path.dirname(os.path.realpath(sys.argv[0])) + '/MyDictionary/OtherResources', outputDictionaryPath + '/OtherResources')
+shutil.copy2(os.path.dirname(os.path.realpath(sys.argv[0])) + '/../template/MyDictionary.css', outputDictionaryPath)
+#shutil.copy2(os.path.dirname(os.path.realpath(sys.argv[0])) + '/../template/padding.gif', outputDictionaryPath)
+#if not os.path.exists(outputDictionaryPath + '/OtherResources'):
+#    shutil.copytree(os.path.dirname(os.path.realpath(sys.argv[0])) + '/../template/OtherResources', outputDictionaryPath + '/OtherResources')
 
 
 print('Done.')

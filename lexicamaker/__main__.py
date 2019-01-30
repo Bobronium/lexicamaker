@@ -110,7 +110,7 @@ def main():
     print (ioDict.annotationFile.name)
     print (ioDict.abbreviationsFile.name)
 
-
+    from lexicamaker import dslconverter
 #    print (dictionaryFile)
 
 
