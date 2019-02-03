@@ -183,44 +183,72 @@ czech_noIndexList = [
 
 # Open and create dictionary files
 
-dictionaryFileName = os.path.basename(sys.argv[1])
+from .__main__ import IOBridge
 
-if dictionaryFileName.find('.dsl') == -1:
-    sys.exit("This is not a .dsl file. Aborting.")
-if '_abrv.dsl' in dictionaryFileName:
-    sys.exit("This is an abbreviations file. Aborting.")
+ioDict = IOBridge()
+ioDict.open_input_files()
 
-print('Converting ' + dictionaryFileName)
 
-dictionaryName = re.sub('.dsl', '', dictionaryFileName)
-dictionaryPath = os.path.dirname(os.path.abspath(sys.argv[1]))
-dictionaryFile = open(sys.argv[1], 'r', encoding='utf-16le')
+#dictionaryFileName = os.path.basename(sys.argv[1])
 
-outputDictionaryPath = dictionaryPath + '/' + dictionaryName
+#if dictionaryFileName.find('.dsl') == -1:
+#    sys.exit("This is not a .dsl file. Aborting.")
+#if '_abrv.dsl' in dictionaryFileName:
+#    sys.exit("This is an abbreviations file. Aborting.")
 
-if not os.path.exists(outputDictionaryPath):
-    os.makedirs(outputDictionaryPath)
+print('Converting ' + os.path.basename(ioDict.dictionaryFile.name))
 
-XMLfile = open(outputDictionaryPath + '/MyDictionary.xml', 'w+', encoding='utf-8') # this is the output file
-makefile = open(outputDictionaryPath + '/Makefile', 'w+', encoding='utf-8')
-MyInfoFile = open(outputDictionaryPath + '/MyInfo.plist', 'w+', encoding='utf-8')
+#dictionaryName = re.sub('.dsl', '', dictionaryFileName)
+#dictionaryPath = os.path.dirname(os.path.abspath(sys.argv[1]))
+#dictionaryFile = open(sys.argv[1], 'r', encoding='utf-16le')
 
-try:
-    abbreviationsFile = open(re.sub('.dsl', '_abrv.dsl', sys.argv[1]), 'r', encoding='utf-16le')
-    abbreviationsContents = abbreviationsFile.read().replace(u'\ufeff', '')  #.encode('utf-8')
+#outputDictionaryPath = dictionaryPath + '/' + dictionaryName
+
+dictionaryName = ioDict.dictionaryName
+#dictionaryFile = ioDict.dictionaryFile
+outputDictionaryPath = ioDict.outputDictionaryPath
+
+
+#try:
+#    abbreviationsFile = open(re.sub('.dsl', '_abrv.dsl', sys.argv[1]), 'r', encoding='utf-16le')
+#    abbreviationsContents = abbreviationsFile.read().replace(u'\ufeff', '')  #.encode('utf-8')
+#    gAbbreviationsList = abbreviationsContents.splitlines()
+#except FileNotFoundError:
+#    gAbbreviationsList = ''
+    
+#try:
+#    annotationFile = open(re.sub('.dsl', '.ann', sys.argv[1]), 'r', encoding='utf-16le')
+#    annotationContents = annotationFile.read().replace(u'\ufeff', '')  # remove unicode characters
+#    annotationList = annotationContents.splitlines()
+#except FileNotFoundError:
+#    annotationList = ''
+
+if ioDict.abbreviationsFile:
+    abbreviationsContents = ioDict.abbreviationsFile.read().replace(u'\ufeff', '')  # remove unicode characters
     gAbbreviationsList = abbreviationsContents.splitlines()
-except FileNotFoundError:
+else:
     gAbbreviationsList = ''
-    
-try:
-    annotationFile = open(re.sub('.dsl', '.ann', sys.argv[1]), 'r', encoding='utf-16le')
-    annotationContents = annotationFile.read().replace(u'\ufeff', '')  # remove unicode characters
-    annotationList = annotationContents.splitlines()
-except FileNotFoundError:
-    annotationList = ''
-    
 
-dictionaryContents = dictionaryFile.read().replace(u'\ufeff', '') # remove unicode characters
+if ioDict.annotationFile:
+    annotationContents = ioDict.annotationFile.read().replace(u'\ufeff', '')  # remove unicode characters
+    annotationList = annotationContents.splitlines()
+else:
+    annotationList = ''
+
+#if not os.path.exists(outputDictionaryPath):
+#    os.makedirs(outputDictionaryPath)
+
+#XMLfile = open(outputDictionaryPath + '/MyDictionary.xml', 'w+', encoding='utf-8') # this is the output file
+#makefile = open(outputDictionaryPath + '/Makefile', 'w+', encoding='utf-8')
+#MyInfoFile = open(outputDictionaryPath + '/MyInfo.plist', 'w+', encoding='utf-8')
+
+ioDict.open_output_files()
+
+XMLfile = ioDict.XMLfile
+makefile = ioDict.Makefile
+MyInfoFile = ioDict.MyInfoFile
+
+dictionaryContents = ioDict.dictionaryFile.read().replace(u'\ufeff', '') # remove unicode characters
 dictionaryList = dictionaryContents.splitlines() # convert dictionary to an array  of lines
 
 

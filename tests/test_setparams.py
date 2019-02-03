@@ -79,7 +79,7 @@ def test_argparse3():
     #os.chdir(os.path.dirname(__file__))
     
     args = IOBridge(['path/file.dsl'])
-    assert args.outputDictionaryPath == os.getcwd()
+    assert args.outputDictionaryPath == os.path.join(os.getcwd(), args.dictionaryName)
     #assert args.parser.parse_args(['path/file.dsl']).outputDictionaryPath == 'path/file.dsa'
     
     args.parse_args(['path/file.dsl', 'adir'])
@@ -98,7 +98,7 @@ def test_argparse4():
     from lexicamaker.__main__ import IOBridge
 
     args = IOBridge(['--remote', 'test_setparams_data/dict1.dsl'])
-    args.open_files()
+    args.open_input_files()
     
     assert args.outputDictionaryPath == 'test_setparams_data/dict1'
     assert args.dictionaryName == 'dict1'
@@ -107,19 +107,19 @@ def test_argparse4():
     assert args.abbreviationsFile.name == 'test_setparams_data/dict1_abrv.dsl'
 
     args.parse_args(['--no-annotation', '--no-abbreviations', 'test_setparams_data/dict1.dsl'])
-    args.open_files()
+    args.open_input_files()
     assert args.dictionaryFile.name == 'test_setparams_data/dict1.dsl'
     assert args.annotationFile == False
     assert args.abbreviationsFile == False
     
     args.parse_args(['--annotation', 'test_setparams_data/dict1.ann', '--abbreviations', 'test_setparams_data/dict1_abrv.dsl', 'test_setparams_data/dict2.dsl'])
-    args.open_files()
+    args.open_input_files()
     assert args.dictionaryFile.name == 'test_setparams_data/dict2.dsl'
     assert args.annotationFile.name == 'test_setparams_data/dict1.ann'
     assert args.abbreviationsFile.name == 'test_setparams_data/dict1_abrv.dsl'
 
     args = IOBridge(['--remote', 'test_setparams_data/dict3.dsx'])
-    args.open_files()
+    args.open_input_files()
     assert args.outputDictionaryPath == 'test_setparams_data/dict3.dsx'
     assert args.dictionaryName == 'dict3.dsx'
     assert args.dictionaryFile.name == 'test_setparams_data/dict3.dsx'
