@@ -39,7 +39,7 @@ class IOBridge:
                                     help="Skip media entries")
         subgroup_media.add_argument('--media', metavar='TYPE', choices=['wav', 'mp3', 'm4a', 'aac'],
                                     help="Change media type to TYPE. Supported formats are \'wav\', \'mp3\', \'m4a\', and \'aac\'")
-        group.add_argument('--encoding', metavar='ENCODING', default='utf-16le', choices=['utf-8', 'utf-16', 'utf-16le', 'utf-16be'],
+        group.add_argument('--encoding', metavar='ENCODING', default='utf-16', choices=['utf-8', 'utf-16', 'utf-16le', 'utf-16be'],
                                     help="Set DSL dictionary encoding, suppored encodings are \'utf-8\' and \'utf-16\' (default). If in latter encoding the Byte Order Mark is is missing use \'utf-16le\' or \'utf-16be\'.")
         parser.add_argument('--version', action='version', version="lexicamaker v%s" % __version__ ) #"%(prog)s v{}".format(__version__))
         subgroup_opath.add_argument('--remote', action='store_true',
@@ -119,7 +119,7 @@ class IOBridge:
 
 def main():
     #ioDict = IOBridge()
-    #ioDict.open_files()
+    #ioDict.open_input_files()
 
     #print (ioDict.encoding)
     #print (ioDict.outputDictionaryPath)
@@ -127,6 +127,10 @@ def main():
     #print (ioDict.dictionaryFile.name)
     #print (ioDict.annotationFile.name)
     #print (ioDict.abbreviationsFile.name)
+    
+    #print(ioDict.dictionaryFile.read(1).encode('raw_unicode_escape'))
+    
+
     from . import dslconverter
 
 
