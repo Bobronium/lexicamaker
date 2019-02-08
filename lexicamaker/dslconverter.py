@@ -248,7 +248,9 @@ XMLfile = ioDict.XMLfile
 makefile = ioDict.Makefile
 MyInfoFile = ioDict.MyInfoFile
 
-dictionaryContents = ioDict.dictionaryFile.read().replace(u'\ufeff', '') # remove unicode characters
+
+dictionaryContents = ioDict.dictionaryFile.read() # no need to remove unicode characters if open as utf-16 not as utf-16le
+#dictionaryContents = ioDict.dictionaryFile.read().replace(u'\ufeff', '') # remove unicode characters
 dictionaryList = dictionaryContents.splitlines() # convert dictionary to an array  of lines
 
 
@@ -270,8 +272,8 @@ for annotationLine in annotationList:
 
 XMLfile.write('	</d:entry>\n')       
 
-def shellquote(s):
-    return "'" + s.replace("'", "'\\''") + "'"
+#def shellquote(s):
+#    return "'" + s.replace("'", "'\\''") + "'"
 
 
 def update_progress(progress):
