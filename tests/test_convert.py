@@ -4,8 +4,9 @@
 import os
 
 from .context import lexicamaker
-from lexicamaker.dsl import *
-
+#from lexicamaker.dsl import *
+from lexicamaker.dsl import processDSLbodyline
+from lexicamaker.dsl import processDSLentry
 
 def setup_function(function):
     """Provides info on the failed function."""
@@ -16,7 +17,7 @@ def test_convert_simple_line():
     """Checks conversion of the simplest tags."""
     
     strIn1  = r"\[[u]'əup(ə)n[/u]\] [c]брит.[/c] [b]1.[/b] [i]прил.[/i] открытый"
-    strOut1 = "<div>\\[<u>'əup(ə)n</u>\\] <font color=\"green\">брит.</font> <b>1.</b> <i>прил.</i> открытый</div>"
+    strOut1 = "\\[<u>'əup(ə)n</u>\\] <font color=\"green\">брит.</font> <b>1.</b> <i>прил.</i> открытый"
     
     assert processDSLbodyline(strIn1) == strOut1
 
@@ -50,8 +51,8 @@ abandonee
     outStr0 = r"""<d:entry id="please__do_not_abandon_me_">
 <d:index d:value="please, do not abandon me!" d:title="please, do not abandon me!"/>
 <d:index d:value="abandonee" d:title="abandonee"/>
-<div>\[<span d:pr="1">əˌbændə'niː</span>\]</div>
-<div>сущ.</div>
+\[<span d:pr="1">əˌbændə'niː</span>\]
+сущ.
 <div class="m1">1) юр. лицо, в пользу которого имеет место отказ от права</div>
 <div class="m1">2) мор. страховщик, в пользу которого остаётся застрахованный груз <i>или</i> застрахованное судно в случае аварии</div>
 </d:entry>

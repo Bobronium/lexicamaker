@@ -67,10 +67,17 @@ def processDSLstring(string):
 
     return string
 
+# Here we add attributes to the processDSLstring() function.
+# 1) whether the __indexing__ should be performed with values:
+#    True   if indexing should be performed
+#    False  if indexing should not be performed
+#    None   no indexing until it changes to True
+processDSLstring.__indexing__ = None
+
 def __parse_ex__(match):
     print(match)
     print(match.group())
-    print(match.expand('\g<text>'))
+    print(match.expand(r'\g<text>'))
     
     processDSLstring.__indexing__ = True
     
@@ -78,20 +85,74 @@ def __parse_ex__(match):
 
     del(processDSLstring.__indexing__)
     
-    return match.expand('\g<text>')
+    return match.expand(r'\g<text>')
 
 def __parse_lang__(match):
+    idtoname = {
+                    #'1068' : 'AzeriLatin',
+                    '1033' : 'English',
+                    '1025' : 'Arabic',
+                    '1067' : 'Armenian',
+                    '32811': 'ArmenianWestern',
+                    '1078' : 'Afrikaans',
+                    '1069' : 'Basque',
+                    '1133' : 'Bashkir',
+                    '1059' : 'Belarusian',
+                    '1026' : 'Bulgarian',
+                    '1038' : 'Hungarian',
+                    '1043' : 'Dutch',
+                    '1032' : 'Greek',
+                    '1079' : 'Georgian',
+                    '1030' : 'Danish',
+                    '1057' : 'Indonesian',
+                    '1039' : 'Icelandic',
+                    '3082' : 'SpanishModernSort',
+                    '1034' : 'SpanishTraditionalSort',
+                    '1040' : 'Italian',
+                    '1087' : 'Kazakh',
+                    #'1595' : 'Kirgiz',
+                    '1028' : 'Chinese',
+                    '2052' : 'ChinesePRC',
+                    '1142' : 'Latin',
+                    '1062' : 'Latvian',
+                    '1063' : 'Lithuanian',
+                    '1086' : 'Malay',
+                    '1031' : 'German',
+                    #'32775': 'GermanNewSpelling',
+                    '1044' : 'NorwegianBokmal',
+                    '2068' : 'NorwegianNynorsk',
+                    '1045' : 'Polish',
+                    '2070' : 'PortugueseStandard',
+                    '1048' : 'Romanian',
+                    '1049' : 'Russian',
+                    '3098' : 'SerbianCyrillic',
+                    '1051' : 'Slovak',
+                    '1060' : 'Slovenian',
+                    '1089' : 'Swahili',
+                    '1064' : 'Tajik',
+                    '1092' : 'Tatar',
+                    '1055' : 'Turkish',
+                    #'1090' : 'Turkmen',
+                    #'1091' : 'UzbekLatin',
+                    '1058' : 'Ukrainian',
+                    '1035' : 'Finnish',
+                    '1036' : 'French',
+                    '1029' : 'Czech',
+                    '1053' : 'Swedish',
+                    '1061' : 'Estonian'
+                }
+    
     print(match)
     print(match.group())
-    print(match.expand('\g<text>'))
+    print(match.expand(r'\g<text>'))
     
-    processDSLstring.__language__ = match.expand('\g<name>')
+    processDSLstring.__language__ = match.expand(r'\g<name>')
     
     # run indexing and processing
     
     del(processDSLstring.__language__)
     
-    return match.expand('\g<text>')
+    return match.expand(r'\g<text>')
 
 def processDSLbodyline(string):
     """ Processing the line by calling processDSLstring() and wrapping free parts as paragraphs by <div>s. """
