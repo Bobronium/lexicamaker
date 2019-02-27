@@ -74,6 +74,9 @@ def processDSLstring(string):
 #    None   no indexing until it changes to True
 processDSLstring.__indexing__ = None
 
+def fix_attr():
+    processDSLstring.__indexing__ = None
+
 def __parse_ex__(match):
     print(match)
     print(match.group())
