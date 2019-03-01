@@ -65,6 +65,11 @@ def processDSLstring(string):
     for tag in DSLtoXMLmaping:
         string = re.sub(tag, DSLtoXMLmaping[tag], string)
 
+
+
+    if processDSLstring.__indexing__ and processDSLstring.__language__ == 'English':
+        processDSLstring.__theindex__.append(string)
+
     return string
 
 # Here we add attributes to the processDSLstring() function.
@@ -72,23 +77,23 @@ def processDSLstring(string):
 #    True   if indexing should be performed
 #    False  if indexing should not be performed
 #    None   no indexing until it changes to True
-processDSLstring.__indexing__ = None
+processDSLstring.__indexing__ = False
+processDSLstring.__language__ = None
+processDSLstring.__theindex__ = []
 
-def fix_attr():
-    processDSLstring.__indexing__ = None
+#def fix_attr():
+#    processDSLstring.__indexing__ = None
 
 def __parse_ex__(match):
-    print(match)
-    print(match.group())
-    print(match.expand(r'\g<text>'))
     
+    # Turn on indexing flag
     processDSLstring.__indexing__ = True
+    # rerun processDSLstring() fir indexing and processing of the substring
+    string = processDSLstring(match.expand(r'\g<text>'))
+    # Turn off indexing flag
+    processDSLstring.__indexing__ = False
     
-    # run indexing and processing
-
-    del(processDSLstring.__indexing__)
-    
-    return match.expand(r'\g<text>')
+    return string
 
 def __parse_lang__(match):
     idtoname = {
@@ -144,22 +149,44 @@ def __parse_lang__(match):
                     '1053' : 'Swedish',
                     '1061' : 'Estonian'
                 }
-    
-    print(match)
-    print(match.group())
-    print(match.expand(r'\g<text>'))
+    # Remember the previous language
+    prevLang = processDSLstring.__language__
+    # Set language flag
+    #lang = match.expand(r'\g<name>')
     
     processDSLstring.__language__ = match.expand(r'\g<name>')
+    # rerun processDSLstring() fir indexing and processing of the substring
+    string = processDSLstring(match.expand(r'\g<text>'))
+    # Remove language flag
+    processDSLstring.__language__ = prevLang
     
-    # run indexing and processing
-    
-    del(processDSLstring.__language__)
-    
-    return match.expand(r'\g<text>')
+    return string
+
+def makeID(string):
+    id = string
+
+    symbolList = {
+            r"_" : r"__",
+            r" " : r"_",
+            r"'" : r"_a_",
+            r"-" : r"_d_",
+            r"\(": r"_l_",
+            r"\)": r"_r_",
+            r"/" : r"_s_"
+        }
+    for symbol in symbolList:
+        id = re.sub(symbol, symbolList[symbol], id)
+
+    print (id)
+    return id
 
 def processDSLbodyline(string):
     """ Processing the line by calling processDSLstring() and wrapping free parts as paragraphs by <div>s. """
 
+    processDSLstring.__indexing__ = False
+    processDSLstring.__language__ = None
+    processDSLstring.__theindex__ = []
+    
     string = processDSLstring(string)
     
     # Make sure that a line is treated as a paragraph.
@@ -179,8 +206,14 @@ def processDSLbodyline(string):
 
     string = ''.join(stringSplit)
 
+    # attach id to the first <div> in the bodyline.
+    # it should be not always precise if there are numerous paragraphs in one bodyline
+    if processDSLstring.__theindex__:
+        string = re.sub(r'<div', r'<div id="' + makeID(processDSLstring.__theindex__[0]) + '" ', string, 1)
+
     # return resulting line
     return string
+
 
 
 

@@ -42,7 +42,7 @@ def test_convert_line_wswitches():
     """Checks conversion of the functional tags tags. In this particular case functions __parse_ex__ and __parse_lang__ are called. Note that they are not accessible directly."""
     
     strIn1  = "[m1]1) [i][trn][com]способ изготовления изображений[/com][/trn][/i][/m][m2][*][ex][lang name=\"English\"]photography[/lang] — фотография[/ex][/*][/m]"
-    strOut1 = "<div class=\"m1\">1) <i>способ изготовления изображений</i></div><div class=\"m2\"><span d:priority=\"2\">photography — фотография</span></div>"
+    strOut1 = "<div id=\"photography\"  class=\"m1\">1) <i>способ изготовления изображений</i></div><div class=\"m2\"><span d:priority=\"2\">photography — фотография</span></div>"
     
     assert processDSLbodyline(strIn1) == strOut1
 
