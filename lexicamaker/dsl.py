@@ -39,7 +39,7 @@ def processDSLstring(string):
                         r'\[ex\](?P<text>.*?)\[/ex\]'   : __parse_ex__,
                         r'\[lang\](?P<text>.*?)\[/lang\]'                      : __parse_lang__,
                         r'\[lang name="(?P<name>\w+)"\](?P<text>.*?)\[/lang\]' : __parse_lang__,
-                        r'\[lang id=(?P<id>\d+)\](?P<text>.*?)\[/lang\]'       : __parse_lang__,
+                        r'\[lang id=(?P<id>\d+)\](?P<text>.*?)\[/lang\]'       : __parse_lang_id__,
                         
                         r'\[trn\]'  : '', r'\[/trn\]'   : '',
                         r'\[com\]'  : '', r'\[/com\]'   : '',
@@ -95,7 +95,7 @@ def __parse_ex__(match):
     
     return string
 
-def __parse_lang__(match):
+def __parse_lang_id__(match):
     idtoname = {
                     #'1068' : 'AzeriLatin',
                     '1033' : 'English',
@@ -152,24 +152,34 @@ def __parse_lang__(match):
     # Remember the previous language
     prevLang = processDSLstring.__language__
     # Set language flag
-    #lang = match.expand(r'\g<name>')
-    
-    processDSLstring.__language__ = match.expand(r'\g<name>')
-    # rerun processDSLstring() fir indexing and processing of the substring
+    processDSLstring.__language__ = idtoname[match.expand(r'\g<id>')]
+    # rerun processDSLstring() for indexing and processing of the substring
     string = processDSLstring(match.expand(r'\g<text>'))
     # Remove language flag
     processDSLstring.__language__ = prevLang
-    
     return string
 
-def makeID(string):
+def __parse_lang__(match):
+    # Remember the previous language
+    prevLang = processDSLstring.__language__
+    # Set language flag
+    processDSLstring.__language__ = match.expand(r'\g<name>')
+    # rerun processDSLstring() for indexing and processing of the substring
+    string = processDSLstring(match.expand(r'\g<text>'))
+    # Remove language flag
+    processDSLstring.__language__ = prevLang
+    return string
+
+def __makeID__(string):
     id = string
 
     symbolList = {
             r"_" : r"__",
             r" " : r"_",
             r"'" : r"_a_",
-            r"-" : r"_d_",
+            r"\." : r"_d_",
+            r"," : r"_c_",
+            r"-" : r"_dash_",
             r"\(": r"_l_",
             r"\)": r"_r_",
             r"/" : r"_s_"
@@ -177,12 +187,15 @@ def makeID(string):
     for symbol in symbolList:
         id = re.sub(symbol, symbolList[symbol], id)
 
-    print (id)
+    id = id.lower()
     return id
+
 
 def processDSLbodyline(string):
     """ Processing the line by calling processDSLstring() and wrapping free parts as paragraphs by <div>s. """
 
+    # We presume that indexing tags are opening and closing in the same bodyline.
+    # Therefore we set off all tags etc.
     processDSLstring.__indexing__ = False
     processDSLstring.__language__ = None
     processDSLstring.__theindex__ = []
@@ -201,18 +214,25 @@ def processDSLbodyline(string):
         for i in [0,-1]:
             if stringSplit[i]:
                 stringSplit[i] = '<div>' + stringSplit[i] + '</div>'
+        string = ''.join(stringSplit)
     #for i, subString in list(enumerate(stringSplit))[0::2]:
     #    stringSplit[i] = '<div>' + subString + '</div>'
 
-    string = ''.join(stringSplit)
 
-    # attach id to the first <div> in the bodyline.
+
+    index = ''
+
+    # attach id to the first <div> in the bodyline if there is something in index.
     # it should be not always precise if there are numerous paragraphs in one bodyline
+
     if processDSLstring.__theindex__:
-        string = re.sub(r'<div', r'<div id="' + makeID(processDSLstring.__theindex__[0]) + '" ', string, 1)
+        id = __makeID__(processDSLstring.__theindex__[0])
+        string = re.sub(r'<div', r'<div id="' + id + '" ', string, 1)
+        for value in processDSLstring.__theindex__:
+            index += '<d:index d:value="' + value + '" d:anchor="xpointer(//*[@id=\'' + id + '\'])"/>'
 
     # return resulting line
-    return string
+    return (string, index)
 
 
 
@@ -221,22 +241,27 @@ def processDSLbodyline(string):
 def processDSLentryhead(entryhead):
     """ This function generates the directives <d:index d:value="" d:title=""/> for further indexing. It also returns the id of the whole entry generated form the first headword """
     head = ''
+    id = __makeID__(entryhead[0])
     for line in entryhead:
-        head = head + '<d:index d:value="' + line + '" d:title="' + line + '"/>\n'
-    id = re.sub('[^a-z0-9]', '_', entryhead[0].lower())
+        head += '<d:index d:value="' + line + '" d:title="' + line + '"/>\n'
     return (id, head)
 
 def processDSLentrybody(entrybody):
     body = ''
+    head = ''
     for line in entrybody:
-        body = body + processDSLbodyline(line) + '\n'
-    return body
+        string, index = processDSLbodyline(line)
+        if string:
+            body += string + '\n'
+        if index:
+            head += index  + '\n'
+    return (head, body)
 
 def processDSLentry(entryhead, entrybody):
     """ Should return entry XML object containing the  """
-    id, head = processDSLentryhead(entryhead)
-    body = processDSLentrybody(entrybody)
-    entry = '<d:entry id="' + id + '">\n' + head + body + '</d:entry>\n'
+    id, headOrig   = processDSLentryhead(entryhead)
+    headBody, body = processDSLentrybody(entrybody)
+    entry = '<d:entry id="' + id + '">\n' + headOrig + headBody + body + '</d:entry>\n'
     return (id, entry)
 
 def processDSLfile(dslFile, xmlFile):
@@ -294,13 +319,13 @@ def writeBaseTags(xmlFile, opening = True):
 
 #theDSLbodyline = r"[c]брит.[/c]"
 
-theDSLbodyline = "[c blue]брит.[/c] [m1]1) [i][trn][com]способ изготовления изображений[/com][/trn][/i][/m][m2][*][ex][lang name=\"English\"]photography[/lang] — фотография[/ex][/*][/m][m2][*][lang name=\"English\"]radiography[/lang] — [ex]радиография[/ex][/*][/m]"
+#theDSLbodyline = "[c blue]брит.[/c] [m1]1) [i][trn][com]способ изготовления изображений[/com][/trn][/i][/m][m2][*][ex][lang name=\"English\"]photography[/lang] — фотография[/ex][/*][/m][m2][*][lang name=\"English\"]radiography[/lang] — [ex]радиография[/ex][/*][/m]"
 
-myString = processDSLbodyline(theDSLbodyline)
+#myString = processDSLbodyline(theDSLbodyline)
 
 #result = re.findall(r'\[lang id=(?P<lid>[0-9]{4})\](?P<text>.*?)\[/lang\]', theDSLbodyline)
 
-print(myString)
+#print(myString)
 
 
 
