@@ -119,15 +119,18 @@ class IOBridge:
 
 
     def copy_template(self):
-        makefileContents = open(os.path.dirname(os.path.realpath(sys.argv[0])) + '/../template/Makefile', 'r', encoding='utf-8').read()
+        makefileContents = open(os.path.join(os.path.dirname(__file__), '../template/Makefile'), 'r', encoding='utf-8').read()
         makefileContents = re.sub('__DictionaryName__', dictionaryName, makefileContents)
         makefile.write(makefileContents)
 
-        MyInfoFileContents = open(os.path.dirname(os.path.realpath(sys.argv[0])) + '/../template/MyInfo.plist', 'r', encoding='utf-8').read()
+        MyInfoFileContents = open(os.path.join(os.path.dirname(__file__), '../template/MyInfo.plist'), 'r', encoding='utf-8').read()
         MyInfoFileContents = re.sub('__DictionaryName__', dictionaryName, MyInfoFileContents)
         MyInfoFileContents = re.sub('__DictionaryTitle__', dictionaryTitle, MyInfoFileContents)
         MyInfoFile.write(MyInfoFileContents)
-        shutil.copy2(os.path.dirname(os.path.realpath(sys.argv[0])) + '/../template/MyDictionary.css', outputDictionaryPath)
+        
+        shutil.copy2(os.path.join(os.path.dirname(__file__), '../template/MyDictionary.css'), outputDictionaryPath)
+        shutil.copy2(os.path.join(os.path.dirname(__file__), '../template/OtherResources/MyDictionary.xsl'), os.path.join(outputDictionaryPath, 'OtherResources'))
+        shutil.copy2(os.path.join(os.path.dirname(__file__), '../template/OtherResources/MyDictionary_prefs.html'), os.path.join(outputDictionaryPath, 'OtherResources'))
 
 
 def main():
@@ -144,8 +147,12 @@ def main():
     #print(ioDict.dictionaryFile.read(1).encode('raw_unicode_escape'))
     
 
-    from . import dslconverter
 
+    #from . import dslconverter
+    pass
+
+def for_test():
+    return os.path.realpath(os.path.join(os.path.dirname(__file__), '../template/Makefile'))
 
 
 

@@ -54,7 +54,7 @@ def writeBaseTags(xmlFile, opening = True):
 #    else:
 #        return "<font color=\"\\g<" + myString + ">\">"
 
-if __name__ == "__main__":
+#if __name__ == "dsl":
 
     #theDSLbodyline = r"[c]\[[u]'əup(ə)n[/u]\][/c] [c blue]брит.[/c] [b]1.[/b] [i]прил.[/i] открытый"
 
@@ -62,12 +62,12 @@ if __name__ == "__main__":
 
     #theDSLbodyline = r"[c]брит.[/c]"
 
-    theDSLbodyline = "[c blue]брит.[/c] [m1]1) [i][trn][com]способ изготовления изображений[/com][/trn][/i][/m][m2][*][ex][lang name=\"English\"]photography[/lang] — фотография[/ex][/*][/m][m2][*][lang name=\"English\"]radiography[/lang] — [ex]радиография[/ex][/*][/m]"
+#    theDSLbodyline = "[c blue]брит.[/c] [m1]1) [i][trn][com]способ изготовления изображений[/com][/trn][/i][/m][m2][*][ex][lang name=\"English\"]photography[/lang] — фотография[/ex][/*][/m][m2][*][lang name=\"English\"]radiography[/lang] — [ex]радиография[/ex][/*][/m]"
 
-    myString = processDSLbodyline(theDSLbodyline)
+#    myString = processDSLbodyline(theDSLbodyline)
 
 
-    print(myString)
+#    print(myString)
 
     #result = re.findall(r'\[lang id=(?P<lid>[0-9]{4})\](?P<text>.*?)\[/lang\]', theDSLbodyline)
 
