@@ -4,7 +4,9 @@
 
 import os, sys
 import argparse
-from lexicamaker import __version__
+#from lexicamaker import __version__
+from . import __version__
+from . import dsl
 
 class IOBridge:
     parser = argparse.ArgumentParser(prog='adsmaker',
@@ -115,6 +117,17 @@ class IOBridge:
         self.Makefile = open(os.path.join(self.outputDictionaryPath, 'Makefile'), 'w+', encoding='utf-8')
         self.MyInfoFile = open(os.path.join(self.outputDictionaryPath, 'MyInfo.plist'), 'w+', encoding='utf-8')
 
+
+    def copy_template(self):
+        makefileContents = open(os.path.dirname(os.path.realpath(sys.argv[0])) + '/../template/Makefile', 'r', encoding='utf-8').read()
+        makefileContents = re.sub('__DictionaryName__', dictionaryName, makefileContents)
+        makefile.write(makefileContents)
+
+        MyInfoFileContents = open(os.path.dirname(os.path.realpath(sys.argv[0])) + '/../template/MyInfo.plist', 'r', encoding='utf-8').read()
+        MyInfoFileContents = re.sub('__DictionaryName__', dictionaryName, MyInfoFileContents)
+        MyInfoFileContents = re.sub('__DictionaryTitle__', dictionaryTitle, MyInfoFileContents)
+        MyInfoFile.write(MyInfoFileContents)
+        shutil.copy2(os.path.dirname(os.path.realpath(sys.argv[0])) + '/../template/MyDictionary.css', outputDictionaryPath)
 
 
 def main():

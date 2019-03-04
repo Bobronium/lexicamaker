@@ -4,9 +4,9 @@
 import os
 
 from .context import lexicamaker
-#from lexicamaker.dsl import *
-from lexicamaker.dsl import processDSLbodyline
-from lexicamaker.dsl import processDSLentry
+#from lexicamaker import dsl
+from lexicamaker.tags import processDSLbodyline
+from lexicamaker.tags import processDSLentry
 
 def setup_function(function):
     """Provides info on the failed function."""
@@ -48,7 +48,7 @@ def test_convert_line_wswitches():
 
 
 
-def test_convert_entry1():
+def test_convert_entry_id():
     inStr1 = r"""please do not abandon me
 abandonee
 """
@@ -78,7 +78,7 @@ abandonee
     #    print(lexicamaker.dsl.processDSLstring.__indexing__)
 #    assert False
 
-def test_convert_entry2():
+def test_convert_entry_index():
     inStr1 = r"""open up
 """
     inStr2 = r"""[p]фраз. гл.[/p]
