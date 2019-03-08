@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 
 
-import os, sys
+import os, sys, re, shutil
 import argparse
 #from lexicamaker import __version__
 from . import __version__
 from . import dsl
+
 
 class IOBridge:
     parser = argparse.ArgumentParser(prog='adsmaker',
@@ -82,7 +83,6 @@ class IOBridge:
         self.parse_args(args, namespace)
         if not namespace:
             self.__set_path_name__()
-        
     
 
 
@@ -113,43 +113,43 @@ class IOBridge:
         """Checks existence of the output path and, opens the files for writing."""
         if not os.path.exists(self.outputDictionaryPath):
             os.makedirs(self.outputDictionaryPath)
+
         self.XMLfile = open(os.path.join(self.outputDictionaryPath, 'MyDictionary.xml'), 'w+', encoding='utf-8') # this is the output file
         self.Makefile = open(os.path.join(self.outputDictionaryPath, 'Makefile'), 'w+', encoding='utf-8')
         self.MyInfoFile = open(os.path.join(self.outputDictionaryPath, 'MyInfo.plist'), 'w+', encoding='utf-8')
 
 
     def copy_template(self):
-        makefileContents = open(os.path.join(os.path.dirname(__file__), '../template/Makefile'), 'r', encoding='utf-8').read()
-        makefileContents = re.sub('__DictionaryName__', dictionaryName, makefileContents)
-        makefile.write(makefileContents)
+        MakefileContents = open(os.path.join(os.path.dirname(__file__), '../template/Makefile'), 'r', encoding='utf-8').read()
+        MakefileContents = re.sub('__DictionaryName__', self.dictionaryName, MakefileContents)
+        self.Makefile.write(MakefileContents)
+        self.Makefile.close()
 
         MyInfoFileContents = open(os.path.join(os.path.dirname(__file__), '../template/MyInfo.plist'), 'r', encoding='utf-8').read()
-        MyInfoFileContents = re.sub('__DictionaryName__', dictionaryName, MyInfoFileContents)
-        MyInfoFileContents = re.sub('__DictionaryTitle__', dictionaryTitle, MyInfoFileContents)
-        MyInfoFile.write(MyInfoFileContents)
+        MyInfoFileContents = re.sub('__DictionaryName__', self.dictionaryName, MyInfoFileContents)
+        MyInfoFileContents = re.sub('__DictionaryTitle__', self.dictionaryName, MyInfoFileContents)
+        self.MyInfoFile.write(MyInfoFileContents)
+        self.MyInfoFile.close()
         
-        shutil.copy2(os.path.join(os.path.dirname(__file__), '../template/MyDictionary.css'), outputDictionaryPath)
-        shutil.copy2(os.path.join(os.path.dirname(__file__), '../template/OtherResources/MyDictionary.xsl'), os.path.join(outputDictionaryPath, 'OtherResources'))
-        shutil.copy2(os.path.join(os.path.dirname(__file__), '../template/OtherResources/MyDictionary_prefs.html'), os.path.join(outputDictionaryPath, 'OtherResources'))
+        shutil.copy2(os.path.join(os.path.dirname(__file__), '../template/MyDictionary.css'), self.outputDictionaryPath)
+        shutil.copytree(os.path.join(os.path.dirname(__file__), '../template/OtherResources'), os.path.join(self.outputDictionaryPath, 'OtherResources'))
+        #shutil.copy2(os.path.join(os.path.dirname(__file__), '../template/OtherResources/MyDictionary.xsl'), os.path.join(self.outputDictionaryPath, 'OtherResources/'))
+        #shutil.copy2(os.path.join(os.path.dirname(__file__), '../template/OtherResources/MyDictionary_prefs.html'), os.path.join(self.outputDictionaryPath, 'OtherResources/'))
 
 
 def main():
-    #ioDict = IOBridge()
-    #ioDict.open_input_files()
+    ioDict = IOBridge()
 
-    #print (ioDict.encoding)
-    #print (ioDict.outputDictionaryPath)
-    #print (ioDict.dictionaryName)
-    #print (ioDict.dictionaryFile.name)
-    #print (ioDict.annotationFile.name)
-    #print (ioDict.abbreviationsFile.name)
+    ioDict.open_input_files()
+    ioDict.open_output_files()
     
-    #print(ioDict.dictionaryFile.read(1).encode('raw_unicode_escape'))
-    
+    dsl.writeBaseTags(ioDict.XMLfile, opening = True)
+    dsl.processDSLfile(ioDict.dictionaryFile, ioDict.XMLfile)
+    dsl.writeBaseTags(ioDict.XMLfile, opening = False)
+    ioDict.dictionaryFile.close()
 
+    ioDict.copy_template()
 
-    #from . import dslconverter
-    pass
 
 def for_test():
     return os.path.realpath(os.path.join(os.path.dirname(__file__), '../template/Makefile'))

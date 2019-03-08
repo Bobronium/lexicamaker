@@ -236,7 +236,7 @@ def processDSLbodyline(string):
 
 
 def processDSLentryhead(entryhead):
-    """ This function generates the directives <d:index d:value="" d:title=""/> for further indexing. It also returns the id of the whole entry generated form the first headword."""
+    """ This function generates the directives <d:index d:value="" d:title=""/> for further indexing. It also returns the id of the whole entry generated from the first headword."""
     head = ''
     id = __makeID__(entryhead[0])
     for line in entryhead:

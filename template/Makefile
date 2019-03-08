@@ -8,7 +8,7 @@
 
 # You need to edit these values.
 
-DICT_NAME		=	"__DictionaryFilename__"
+DICT_NAME		=	"__DictionaryName__"
 DICT_SRC_PATH	=	MyDictionary.xml
 CSS_PATH		=	MyDictionary.css
 PLIST_PATH		=	MyInfo.plist
