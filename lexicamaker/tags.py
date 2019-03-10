@@ -62,9 +62,8 @@ def processDSLstring(string):
     for tag in DSLtoXMLmaping:
         string = re.sub(tag, DSLtoXMLmaping[tag], string)
 
-
-
-    if processDSLstring.__indexing__ and processDSLstring.__language__ == 'English':
+    # if indexing is on and the language match index language then add the string to the index
+    if processDSLstring.__indexing__ and processDSLstring.__language__ == processDSLentry.__index_language__ :
         processDSLstring.__theindex__.append(string)
 
     return string
@@ -78,8 +77,6 @@ processDSLstring.__indexing__ = False
 processDSLstring.__language__ = None
 processDSLstring.__theindex__ = []
 
-#def fix_attr():
-#    processDSLstring.__indexing__ = None
 
 def __parse_ex__(match):
     
@@ -157,6 +154,7 @@ def __parse_lang_id__(match):
     return string
 
 def __parse_lang__(match):
+    # Repeats the code of __parse_lang_id__ function
     # Remember the previous language
     prevLang = processDSLstring.__language__
     # Set language flag
@@ -261,4 +259,6 @@ def processDSLentry(entryhead, entrybody):
     entry = '<d:entry id="' + id + '">\n' + headOrig + headBody + body + '</d:entry>\n'
     return (id, entry)
 
-
+# Here we add attributes to the processDSLentry() function.
+#processDSLentry.__index_language__ = 'Russian'
+processDSLentry.__index_language__ = 'English'

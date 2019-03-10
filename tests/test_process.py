@@ -16,8 +16,9 @@ def setup_function(function):
 def test_process_dsl_file():
     """Checks procession of the DSL file. The file is not real, just a list of lines"""
     
-    strIn1  = """#NAME	"Three words Dictionary"
-#INDEX_LANGUAGE	"English"
+    strIn1  = """
+#NAME	"Three words Dictionary"
+#INDEX_LANGUAGE	"Eenglish"
 #CONTENTS_LANGUAGE	"Russian"
 #ICON_FILE	"3WordsDict.bmp"
 
@@ -58,7 +59,45 @@ zoomorphism
             }
     
     result = processDSLfile(strIn1.splitlines(False))
+    
+    print(result)
 
     for id in result:
         assert result[id] == strOut1[id]
+
+
+def test_process_header_lang():
+    """Checks procession of the DSL file. The file is not real, just a list of lines"""
+    
+    strIn1  = """
+#NAME	"Three words Dictionary"
+#INDEX_LANGUAGE    "English"
+#CONTENTS_LANGUAGE	"Russian"
+#ICON_FILE	"3WordsDict.bmp"
+
+open up
+	[p]фраз. гл.[/p]
+	[m1]1) [trn]открыть [i][com](возможность)[/com][/i], предоставить [i][com](условия)[/com][/trn][/i][/m]
+	[m2][*][ex][lang id=1033]to open up opportunities[/lang] — предоставлять возможности[/ex][/*][/m]
+	[m1]2) [trn]открыться, разоткровенничаться[/trn][/m]
+	[m2][*][ex][lang id=1033]He was silent at first, but soon he opened up and told us about his terrible experiences.[/lang] — Сначала он молчал, но затем открылся и откровенно поведал нам о том, какие ужасы пришлось ему пережить.[/ex][/*][/m]
+"""
+    strOut1 = r"""<d:entry id="open_up">
+<d:index d:value="open up" d:title="open up"/>
+<d:index d:value="to open up opportunities" d:anchor="xpointer(//*[@id='to_open_up_opportunities'])"/>
+<d:index d:value="He was silent at first, but soon he opened up and told us about his terrible experiences." d:anchor="xpointer(//*[@id='he_was_silent_at_first_c__but_soon_he_opened_up_and_told_us_about_his_terrible_experiences_d_'])"/>
+<div>фраз. гл.</div>
+<div class="m1">1) открыть <i>(возможность)</i>, предоставить <i>(условия)</i></div>
+<div id="to_open_up_opportunities"  class="m2"><span d:priority="2">to open up opportunities — предоставлять возможности</span></div>
+<div class="m1">2) открыться, разоткровенничаться</div>
+<div id="he_was_silent_at_first_c__but_soon_he_opened_up_and_told_us_about_his_terrible_experiences_d_"  class="m2"><span d:priority="2">He was silent at first, but soon he opened up and told us about his terrible experiences. — Сначала он молчал, но затем открылся и откровенно поведал нам о том, какие ужасы пришлось ему пережить.</span></div>
+</d:entry>
+"""
+    result = processDSLfile(strIn1.splitlines(False))
+    
+    print(result)
+
+    assert result['open_up'] == strOut1
+#assert False
+
 
