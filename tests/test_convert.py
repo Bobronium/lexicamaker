@@ -44,6 +44,8 @@ def test_convert_line_wswitches():
     strIn1  = "[m1]1) [i][trn][com]способ изготовления изображений[/com][/trn][/i][/m][m2][*][ex][lang name=\"English\"]photography[/lang] — фотография[/ex][/*][/m]"
     strOut1 = "<div id=\"photography\"  class=\"m1\">1) <i>способ изготовления изображений</i></div><div class=\"m2\"><span d:priority=\"2\">photography — фотография</span></div>"
     strOut2 = "<d:index d:value=\"photography\" d:anchor=\"xpointer(//*[@id=\'photography\'])\"/>"
+
+    processDSLentry.__index_language__ = 'English'
     assert processDSLbodyline(strIn1) == (strOut1, strOut2)
 
 
@@ -101,6 +103,7 @@ def test_convert_entry_index():
 </d:entry>
 """
     outStr00 = 'open_up'
+    processDSLentry.__index_language__ = 'English'
     id, entry = processDSLentry(inStr1.splitlines(False), inStr2.splitlines(False))
     print (entry)
     #assert False
