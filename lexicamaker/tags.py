@@ -68,6 +68,15 @@ def processDSLstring(string):
 
     return string
 
+def indexDSLstring(string):
+    DSLtoIndex = {
+                    r'\[!trs\](.*?)\[/!trs]'   : ''
+                 }
+    for tag in DSLtoIndex:
+        string = re.sub(tag, DSLtoIndex[tag], string)
+    return string
+
+
 # Here we add attributes to the processDSLstring() function.
 # 1) whether the __indexing__ should be performed with values:
 #    True   if indexing should be performed
