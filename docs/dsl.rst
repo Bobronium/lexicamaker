@@ -66,7 +66,9 @@ superscript
 ``['], [/']``
 a stressed vowel in a word.
 ``[p], [/p]``
-labels (clicking a label displays its full text)
+labels (clicking a label displays its full text) _automatically excluded from the indexing_
+``[t], [/t]``
+transcription
 
 Indexing tags:
 ~~~~~~~~~~~~~~
@@ -77,8 +79,6 @@ translations zone
 examples zone
 ``[com], [/com]``
 comments zone
-``[t], [/t]``
-transcription
 ``[!trs], [/!trs]``
 the text between these tags will not be indexed
 ``[lang], [lang name="language"], [lang id=code], [/lang]``

@@ -6,7 +6,7 @@ import re
 def processDSLstring(string):
     """ Processing the string by substitution of every known DSL tag by XML tag or calling the corresponding __parse_tag__ function """
 
-    DSLtoXMLmaping = {
+    DSLtoXMLmapping = {
                         # TYPE I TAGS: text-independent, one can map open and closing tags separately.
                         # It is useful if opening and closing tags are not in the same string.
                         # For example: here it's better to match [m] tags separately, while closing tag [/m] can be in the different line
@@ -59,42 +59,52 @@ def processDSLstring(string):
                     }
 
     # Simply substitute every tag in the line
-    for tag in DSLtoXMLmaping:
-        string = re.sub(tag, DSLtoXMLmaping[tag], string)
+    for tag in DSLtoXMLmapping:
+        string = re.sub(tag, DSLtoXMLmapping[tag], string)
 
     # if indexing is on and the language match index language then add the string to the index
-    if processDSLstring.__indexing__ and processDSLstring.__language__ == processDSLentry.__index_language__ :
-        processDSLstring.__theindex__.append(string)
+    if processDSLbodyline.__indexing__ and processDSLbodyline.__language__ == processDSLentry.__index_language__ :
+        processDSLbodyline.__theindex__.append(string)
 
     return string
 
-def indexDSLstring(string):
-    DSLtoIndex = {
-                    r'\[!trs\](.*?)\[/!trs]'   : ''
-                 }
-    for tag in DSLtoIndex:
-        string = re.sub(tag, DSLtoIndex[tag], string)
-    return string
+def indexDSLstring(string, indexing = False ):
+    
+    #DSLtoIndex = {
+    #                r'\[ex\](?P<text>.*?)\[/ex\]'   : __parse_index__,
+    #                r'\[trn\](?P<text>.*?)\[/trn\]' : __parse_index__,
+    #                r'\[com\](?P<text>.*?)\[/com\]' : __parse_index__,
+    #                r'\[!trs\](.*?)\[/!trs]'   : '',
+    #                r'\[p\](.*?)\[/p]'         : ''
+    #             }
+    #for tag in DSLtoIndex:
+    #    print(re.findall(tag, string))
+    #    string = re.sub(tag, DSLtoIndex[tag], string)
+    #return string
+    #print(re.findall(r'(?<!\\)\[.*?\]', string))
+    #print(re.split(r'(?<!\\)\[.*?\]', string))
+    print(re.split(r'(\[.*?\])', string))
+    #print(re.finditer(r'(\[.*?\])', string))
+    #for tag, str in zip(re.findall(r'\[.*?\]', r'[]'+string), re.split(r'\[.*?\]', string)):
+        #print(tag+':'+str)
+    #return [tag,str]
 
 
-# Here we add attributes to the processDSLstring() function.
-# 1) whether the __indexing__ should be performed with values:
-#    True   if indexing should be performed
-#    False  if indexing should not be performed
-#    None   no indexing until it changes to True
-processDSLstring.__indexing__ = False
-processDSLstring.__language__ = None
-processDSLstring.__theindex__ = []
 
+
+def __parse_index__(match):
+    #print('>')
+    #print(match.expand(r'\g<text>'))
+    return match.expand(r'\g<text>')
 
 def __parse_ex__(match):
     
     # Turn on indexing flag
-    processDSLstring.__indexing__ = True
-    # rerun processDSLstring() fir indexing and processing of the substring
+    processDSLbodyline.__indexing__ = True
+    # rerun processDSLstring() for indexing and processing of the substring
     string = processDSLstring(match.expand(r'\g<text>'))
     # Turn off indexing flag
-    processDSLstring.__indexing__ = False
+    processDSLbodyline.__indexing__ = False
     
     return string
 
@@ -153,25 +163,25 @@ def __parse_lang_id__(match):
                     '1061' : 'Estonian'
                 }
     # Remember the previous language
-    prevLang = processDSLstring.__language__
+    prevLang = processDSLbodyline.__language__
     # Set language flag
-    processDSLstring.__language__ = idtoname[match.expand(r'\g<id>')]
+    processDSLbodyline.__language__ = idtoname[match.expand(r'\g<id>')]
     # rerun processDSLstring() for indexing and processing of the substring
     string = processDSLstring(match.expand(r'\g<text>'))
     # Remove language flag
-    processDSLstring.__language__ = prevLang
+    processDSLbodyline.__language__ = prevLang
     return string
 
 def __parse_lang__(match):
     # Repeats the code of __parse_lang_id__ function
     # Remember the previous language
-    prevLang = processDSLstring.__language__
+    prevLang = processDSLbodyline.__language__
     # Set language flag
-    processDSLstring.__language__ = match.expand(r'\g<name>')
+    processDSLbodyline.__language__ = match.expand(r'\g<name>')
     # rerun processDSLstring() for indexing and processing of the substring
     string = processDSLstring(match.expand(r'\g<text>'))
     # Remove language flag
-    processDSLstring.__language__ = prevLang
+    processDSLbodyline.__language__ = prevLang
     return string
 
 def __makeID__(string):
@@ -200,9 +210,9 @@ def processDSLbodyline(string):
 
     # We presume that indexing tags are opening and closing in the same bodyline.
     # Therefore we set off all tags etc.
-    processDSLstring.__indexing__ = False
-    processDSLstring.__language__ = None
-    processDSLstring.__theindex__ = []
+    processDSLbodyline.__indexing__ = False
+    processDSLbodyline.__language__ = None
+    processDSLbodyline.__theindex__ = []
     
     string = processDSLstring(string)
     
@@ -229,16 +239,23 @@ def processDSLbodyline(string):
     # attach id to the first <div> in the bodyline if there is something in index.
     # it should be not always precise if there are numerous paragraphs in one bodyline
 
-    if processDSLstring.__theindex__:
-        id = __makeID__(processDSLstring.__theindex__[0])
+    if processDSLbodyline.__theindex__:
+        id = __makeID__(processDSLbodyline.__theindex__[0])
         string = re.sub(r'<div', r'<div id="' + id + '" ', string, 1)
-        for value in processDSLstring.__theindex__:
+        for value in processDSLbodyline.__theindex__:
             index += '<d:index d:value="' + value + '" d:anchor="xpointer(//*[@id=\'' + id + '\'])"/>'
 
     # return resulting line
     return (string, index)
 
-
+# Here we add attributes to the processDSLbodyline() function.
+# 1) whether the __indexing__ should be performed with values:
+#    True   if indexing should be performed
+#    False  if indexing should not be performed
+#    None   no indexing until it changes to True
+processDSLbodyline.__indexing__ = False
+processDSLbodyline.__language__ = None
+processDSLbodyline.__theindex__ = []
 
 
 
