@@ -20,11 +20,12 @@ def test_index():
     #strIn1  = r"[test] zero [ex] one [!trs] two [/!trs] three [/ex] four [ex x=qwe] five [!trs] six [/!trs] seven [/ex] eight"
     #strOut1 = r"zero [ex] one  four  seven [/ex] eight"
     #print(strIn1)
-    strIn1  = r"[test] one 12[ex x=qwe] two[/ex] three &#x005B;transcription&#x005D; four &#x005C;[qwe]"
-    res = indexDSLstring(strIn1)
-    print(res)
-    print(strIn1)
+    strIn1  = r"zero [test] one [ex] two[/ex] three [ex]transcription[/ex] four [qwe] five [ex] six"
+    listOut1 = [r" two", r"transcription", r" six"]
 
-    assert True
-    #assert strOut1 == res
+
+    #print(zzz)
+    #print(strOut1)
+
+    assert indexDSLstring(strIn1) == listOut1
 

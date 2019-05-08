@@ -13,8 +13,12 @@ Hierarchy of the called functions
 |   ↳ ``processDSLentrybody([lines])``
 |               should search for subentries and call ``processDSLentry()``
 |    ↳ ``processDSLbodyline(line)``
-|     ↳ ``processDSLstring(string)``
+|     ↳ ``convertDSLstring(string)``
 |               contains ``__indexing__`` and ``__language__`` and ``__theindex__``, returns ``(string, index)``
 |      ↳ ``__parse_tag__(match)``
-|               always called for text between tags and should call ``processDSLstring()`` for it
+|               always called for text between tags and should call ``convertDSLstring()`` for it
+|     ↳ ``indexDSLstring(string)``
+|               contains ``__indexing__`` and ``__language__`` and ``__theindex__``, returns ``(string, index)``
+|      ↳ ``__parse_tag__(match)``
+|               always called for text between tags and should call ``convertDSLstring()`` for it
 

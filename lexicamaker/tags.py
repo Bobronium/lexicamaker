@@ -3,7 +3,7 @@
 
 import re
 
-def processDSLstring(string):
+def convertDSLstring(string):
     """ Processing the string by substitution of every known DSL tag by XML tag or calling the corresponding __parse_tag__ function """
 
     DSLtoXMLmapping = {
@@ -68,26 +68,65 @@ def processDSLstring(string):
 
     return string
 
-def indexDSLstring(string, indexing = False ):
+def indexDSLstring(string):
+
+    indexing = False
     
-    #DSLtoIndex = {
-    #                r'\[ex\](?P<text>.*?)\[/ex\]'   : __parse_index__,
+    index = []
+    def __indexing_on__():
+        nonlocal indexing
+        indexing = True
+    def __indexing_off__():
+        nonlocal indexing
+        indexing = False
+    
+    DSLindex = {
+                    r'\[ex\]'  : __indexing_on__,
+                    r'\[/ex\]' : __indexing_off__,
     #                r'\[trn\](?P<text>.*?)\[/trn\]' : __parse_index__,
     #                r'\[com\](?P<text>.*?)\[/com\]' : __parse_index__,
     #                r'\[!trs\](.*?)\[/!trs]'   : '',
     #                r'\[p\](.*?)\[/p]'         : ''
-    #             }
+                 }
+    print(string)
+    splitString = iter(re.split(r'(\[.*?\])', string))
+    
+    
+    for data in splitString:
+        #print(data)
+        #print(indexing, data)
+        if indexing:
+            index.append(data)
+        tag = next(splitString, None)
+        #print(tag)
+        if tag:
+            for itag in DSLindex:
+                #print(tag, itag)
+                if (re.fullmatch(itag, tag)!=None):
+                    #print('HEY!')
+                    DSLindex[itag]()
+        #pass
+
+
+
+    #print(index)
+
+    
     #for tag in DSLtoIndex:
     #    print(re.findall(tag, string))
     #    string = re.sub(tag, DSLtoIndex[tag], string)
     #return string
     #print(re.findall(r'(?<!\\)\[.*?\]', string))
     #print(re.split(r'(?<!\\)\[.*?\]', string))
-    print(re.split(r'(\[.*?\])', string))
+    
+    
+    
+    #print(re.split(r'(\[.*?\])', string))
     #print(re.finditer(r'(\[.*?\])', string))
     #for tag, str in zip(re.findall(r'\[.*?\]', r'[]'+string), re.split(r'\[.*?\]', string)):
         #print(tag+':'+str)
-    #return [tag,str]
+
+    return index
 
 
 
@@ -101,8 +140,8 @@ def __parse_ex__(match):
     
     # Turn on indexing flag
     processDSLbodyline.__indexing__ = True
-    # rerun processDSLstring() for indexing and processing of the substring
-    string = processDSLstring(match.expand(r'\g<text>'))
+    # rerun convertDSLstring() for indexing and processing of the substring
+    string = convertDSLstring(match.expand(r'\g<text>'))
     # Turn off indexing flag
     processDSLbodyline.__indexing__ = False
     
@@ -166,8 +205,8 @@ def __parse_lang_id__(match):
     prevLang = processDSLbodyline.__language__
     # Set language flag
     processDSLbodyline.__language__ = idtoname[match.expand(r'\g<id>')]
-    # rerun processDSLstring() for indexing and processing of the substring
-    string = processDSLstring(match.expand(r'\g<text>'))
+    # rerun convertDSLstring() for indexing and processing of the substring
+    string = convertDSLstring(match.expand(r'\g<text>'))
     # Remove language flag
     processDSLbodyline.__language__ = prevLang
     return string
@@ -178,8 +217,8 @@ def __parse_lang__(match):
     prevLang = processDSLbodyline.__language__
     # Set language flag
     processDSLbodyline.__language__ = match.expand(r'\g<name>')
-    # rerun processDSLstring() for indexing and processing of the substring
-    string = processDSLstring(match.expand(r'\g<text>'))
+    # rerun convertDSLstring() for indexing and processing of the substring
+    string = convertDSLstring(match.expand(r'\g<text>'))
     # Remove language flag
     processDSLbodyline.__language__ = prevLang
     return string
@@ -206,7 +245,7 @@ def __makeID__(string):
 
 
 def processDSLbodyline(string):
-    """ Processing the line by calling processDSLstring() and wrapping free parts as paragraphs by <div>s. """
+    """ Processing the line by calling convertDSLstring() and wrapping free parts as paragraphs by <div>s. """
 
     # We presume that indexing tags are opening and closing in the same bodyline.
     # Therefore we set off all tags etc.
@@ -214,7 +253,7 @@ def processDSLbodyline(string):
     processDSLbodyline.__language__ = None
     processDSLbodyline.__theindex__ = []
     
-    string = processDSLstring(string)
+    string = convertDSLstring(string)
     
     # Make sure that a line is treated as a paragraph.
     # Either the whole line is wrapped in <div>,

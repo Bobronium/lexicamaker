@@ -77,7 +77,7 @@ abandonee
 
     #def test_import_dict():
     #    lexicamaker.dsl.fix_attr()
-    #    print(lexicamaker.dsl.processDSLstring.__indexing__)
+    #    print(lexicamaker.dsl.convertDSLstring.__indexing__)
 #    assert False
 
 def test_convert_entry_index():
