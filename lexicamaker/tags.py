@@ -32,123 +32,57 @@ def convertDSLstring(string):
                         # Downside is that opening and closing tags should be in the same line.
                         # In case they isn't one has to substitute free dangling tags by empty string afterwards
                         
-                        
-                        r'\[ex\](?P<text>.*?)\[/ex\]'   : __parse_ex__,
-                        r'\[lang\](?P<text>.*?)\[/lang\]'                      : __parse_lang__,
-                        r'\[lang name="(?P<name>\w+)"\](?P<text>.*?)\[/lang\]' : __parse_lang__,
-                        r'\[lang id=(?P<id>\d+)\](?P<text>.*?)\[/lang\]'       : __parse_lang_id__,
-                        
-                        r'\[trn\]'  : '', r'\[/trn\]'   : '',
-                        r'\[com\]'  : '', r'\[/com\]'   : '',
-                        r'\[!trs\]' : '', r'\[/!trs]'   : '',
-                        
-                        r'\[lang\]'            : '',
-                        r'\[lang name="\w+"\]' : '',
-                        r'\[lang id=\d+\]'     : '',
-                        r'\[/lang\]'           : '',
-                        
-                        r'\[p\]'    : '', r'\[/p\]'     : '',
+                        r'\[p\]'    : r'<font color="green">',
+                        r'\[/p\]'   : r'</font>',
                         r'\[t\]'    : r'<span d:pr="1">',
                         r'\[/t\]'   : r'</span>',
                         r'\[s\]'    : '', r'\[/s\]'     : '',
                         r'<<'       : '', r'>>'         : '',
                         r'\[ref\]'                             : '',
-                        r'\[ref dict="(?P<dname>[\w\s]+)"\]' : '',
+                        r'\[ref dict="(?P<dname>[\w\s]+)"\]'   : '',
                         r'\[/ref\]'                            : '',
-                        r'\[url\]'  : '', r'\[/url\]'   : ''
+                        r'\[url\]'  : '', r'\[/url\]'   : '',
+                        
+                        # REST OF TAGS: substituted by empty string
+                        
+                        r'\[.*?\]' : ''
                     }
 
     # Simply substitute every tag in the line
     for tag in DSLtoXMLmapping:
         string = re.sub(tag, DSLtoXMLmapping[tag], string)
 
-    # if indexing is on and the language match index language then add the string to the index
-    if processDSLbodyline.__indexing__ and processDSLbodyline.__language__ == processDSLentry.__index_language__ :
-        processDSLbodyline.__theindex__.append(string)
-
     return string
 
 def indexDSLstring(string):
 
     indexing = False
+    language = processDSLentry.__contents_language__
     
     index = []
-    def __indexing_on__():
+    def __indexing_on__(match):
         nonlocal indexing
         indexing = True
-    def __indexing_off__():
+    
+    def __indexing_off__(match):
         nonlocal indexing
         indexing = False
     
-    DSLindex = {
-                    r'\[ex\]'  : __indexing_on__,
-                    r'\[/ex\]' : __indexing_off__,
-    #                r'\[trn\](?P<text>.*?)\[/trn\]' : __parse_index__,
-    #                r'\[com\](?P<text>.*?)\[/com\]' : __parse_index__,
-    #                r'\[!trs\](.*?)\[/!trs]'   : '',
-    #                r'\[p\](.*?)\[/p]'         : ''
-                 }
-    print(string)
-    splitString = iter(re.split(r'(\[.*?\])', string))
+    def __default_lang__(match):
+        nonlocal language
+        language = processDSLentry.__index_language__
     
+    def __reset_lang__(match):
+        nonlocal language
+        language = processDSLentry.__contents_language__
     
-    for data in splitString:
-        #print(data)
-        #print(indexing, data)
-        if indexing:
-            index.append(data)
-        tag = next(splitString, None)
-        #print(tag)
-        if tag:
-            for itag in DSLindex:
-                #print(tag, itag)
-                if (re.fullmatch(itag, tag)!=None):
-                    #print('HEY!')
-                    DSLindex[itag]()
-        #pass
-
-
-
-    #print(index)
-
+    def __set_lang__(match):
+        nonlocal language
+        language = match.expand(r'\g<text>')
     
-    #for tag in DSLtoIndex:
-    #    print(re.findall(tag, string))
-    #    string = re.sub(tag, DSLtoIndex[tag], string)
-    #return string
-    #print(re.findall(r'(?<!\\)\[.*?\]', string))
-    #print(re.split(r'(?<!\\)\[.*?\]', string))
-    
-    
-    
-    #print(re.split(r'(\[.*?\])', string))
-    #print(re.finditer(r'(\[.*?\])', string))
-    #for tag, str in zip(re.findall(r'\[.*?\]', r'[]'+string), re.split(r'\[.*?\]', string)):
-        #print(tag+':'+str)
-
-    return index
-
-
-
-
-def __parse_index__(match):
-    #print('>')
-    #print(match.expand(r'\g<text>'))
-    return match.expand(r'\g<text>')
-
-def __parse_ex__(match):
-    
-    # Turn on indexing flag
-    processDSLbodyline.__indexing__ = True
-    # rerun convertDSLstring() for indexing and processing of the substring
-    string = convertDSLstring(match.expand(r'\g<text>'))
-    # Turn off indexing flag
-    processDSLbodyline.__indexing__ = False
-    
-    return string
-
-def __parse_lang_id__(match):
-    idtoname = {
+    def __set_lang_id__(match):
+        nonlocal language
+        idtoname = {
                     #'1068' : 'AzeriLatin',
                     '1033' : 'English',
                     '1025' : 'Arabic',
@@ -200,28 +134,54 @@ def __parse_lang_id__(match):
                     '1029' : 'Czech',
                     '1053' : 'Swedish',
                     '1061' : 'Estonian'
-                }
-    # Remember the previous language
-    prevLang = processDSLbodyline.__language__
-    # Set language flag
-    processDSLbodyline.__language__ = idtoname[match.expand(r'\g<id>')]
-    # rerun convertDSLstring() for indexing and processing of the substring
-    string = convertDSLstring(match.expand(r'\g<text>'))
-    # Remove language flag
-    processDSLbodyline.__language__ = prevLang
-    return string
+            }
+        language = idtoname[match.expand(r'\g<id>')]
 
-def __parse_lang__(match):
-    # Repeats the code of __parse_lang_id__ function
-    # Remember the previous language
-    prevLang = processDSLbodyline.__language__
-    # Set language flag
-    processDSLbodyline.__language__ = match.expand(r'\g<name>')
-    # rerun convertDSLstring() for indexing and processing of the substring
-    string = convertDSLstring(match.expand(r'\g<text>'))
-    # Remove language flag
-    processDSLbodyline.__language__ = prevLang
-    return string
+    #    def __translation_on__(match):
+    #        nonlocal indexing
+    #        nonlocal language
+    #        indexing = True
+    #        language = processDSLentry.__contents_language__
+    #    def __translation_off__(match):
+    #        nonlocal indexing
+    #        #nonlocal language
+    #        indexing = False
+    #        #language = processDSLentry.__contents_language__
+                
+    DSLindex = {
+                    r'\[ex\]'  : __indexing_on__,
+                    r'\[/ex\]' : __indexing_off__,
+                    r'\[lang\]'                      : __default_lang__,
+                    r'\[/lang\]'                     : __reset_lang__,
+                    r'\[lang name="(?P<name>\w+)"\]' : __set_lang__,
+                    r'\[lang id=(?P<id>\d+)\]'       : __set_lang_id__
+                    #r'\[trn\]'   : __translation_on__,
+                    #r'\[/trn\]'  : __translation_off__,
+                    #r'\[!trs\]'  : __indexing_off__,
+                    #r'\[/!trs\]' : __indexing_on__,
+                    #r'\[com\]'  : __indexing_off__,
+                    #r'\[/com\]' : __indexing_on__,
+                 }
+    #print(string)
+    splitString = iter(re.split(r'(\[.*?\])', string))
+    
+    
+    for data in splitString:
+        if indexing and language == processDSLentry.__index_language__:
+            index.append(data)
+        tag = next(splitString, None)
+        if tag:
+            for itag in DSLindex:
+                match = re.fullmatch(itag, tag)
+                if (match != None):
+                    #print(match)
+                    DSLindex[itag](match)
+        #pass
+
+    #print(index)
+
+    return index
+
 
 def __makeID__(string):
     id = string
@@ -248,53 +208,42 @@ def processDSLbodyline(string):
     """ Processing the line by calling convertDSLstring() and wrapping free parts as paragraphs by <div>s. """
 
     # We presume that indexing tags are opening and closing in the same bodyline.
-    # Therefore we set off all tags etc.
-    processDSLbodyline.__indexing__ = False
-    processDSLbodyline.__language__ = None
-    processDSLbodyline.__theindex__ = []
+    index = ''
+    divTag = [r'<div>', r'</div>']
+    indexSplit = indexDSLstring(string)
+
     
-    string = convertDSLstring(string)
+    if indexSplit:
+        id = __makeID__(indexSplit[0])
+        # attach id to the first <div> in the bodyline if there is something in index.
+
+        divTag[0] = r'<div id="' + id + '">'
+        for value in indexSplit:
+            index += '<d:index d:value="' + value + '" d:anchor="xpointer(//*[@id=\'' + id + '\'])"/>'
+
+    
+    content = convertDSLstring(string)
     
     # Make sure that a line is treated as a paragraph.
     # Either the whole line is wrapped in <div>,
     # or if there is any new paragraph <div>s in the line,
     # wrap the free beginning and ending of the line in <div>s
 
-    stringSplit = re.split(r'(<div(?: [^<>]+)*>|</div>)',string)
-    if len(stringSplit) == 1:
-        string = '<div>' + string + '</div>'
+    # it should be not always precise if there are numerous paragraphs in one bodyline
+    contentSplit = re.split(r'(<div(?: [^<>]+)*>|</div>)',content)
+    if len(contentSplit) == 1:
+        content = divTag[0] + content + divTag[1]
     else:
         for i in [0,-1]:
-            if stringSplit[i]:
-                stringSplit[i] = '<div>' + stringSplit[i] + '</div>'
-        string = ''.join(stringSplit)
+            if contentSplit[i]:
+                contentSplit[i] = divTag[0] + contentSplit[i] + divTag[1]
+        content = ''.join(contentSplit)
     #for i, subString in list(enumerate(stringSplit))[0::2]:
     #    stringSplit[i] = '<div>' + subString + '</div>'
 
-
-
-    index = ''
-
-    # attach id to the first <div> in the bodyline if there is something in index.
-    # it should be not always precise if there are numerous paragraphs in one bodyline
-
-    if processDSLbodyline.__theindex__:
-        id = __makeID__(processDSLbodyline.__theindex__[0])
-        string = re.sub(r'<div', r'<div id="' + id + '" ', string, 1)
-        for value in processDSLbodyline.__theindex__:
-            index += '<d:index d:value="' + value + '" d:anchor="xpointer(//*[@id=\'' + id + '\'])"/>'
-
     # return resulting line
-    return (string, index)
+    return (content, index)
 
-# Here we add attributes to the processDSLbodyline() function.
-# 1) whether the __indexing__ should be performed with values:
-#    True   if indexing should be performed
-#    False  if indexing should not be performed
-#    None   no indexing until it changes to True
-processDSLbodyline.__indexing__ = False
-processDSLbodyline.__language__ = None
-processDSLbodyline.__theindex__ = []
 
 
 
@@ -325,5 +274,5 @@ def processDSLentry(entryhead, entrybody):
     return (id, entry)
 
 # Here we add attributes to the processDSLentry() function.
-#processDSLentry.__index_language__ = 'Russian'
+processDSLentry.__contents_language__ = 'Russian'
 processDSLentry.__index_language__ = 'English'

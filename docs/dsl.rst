@@ -91,3 +91,5 @@ Reference tags:
 hyperlink to a card in the same dictionary, or in dictionary Dictionary. You can also use ``<<`` and ``>>`` to enclose the headword of the card to make a link)
 ``[s], [/s]``
 multimedia zone (used to add pictures or sound files into a dictionary entries).
+``[url], [/url]``
+forms an URL link
