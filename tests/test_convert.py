@@ -12,6 +12,22 @@ def setup_function(function):
     """Provides info on the failed function."""
     print("Output from %s" % function)
 
+def test_escaping_pattern():
+    """The test of how the pattern checks escaping."""
+    
+    import re
+    strIn1  = r"[Lorem\\] ipsum [\\] dolor \[sit\] amet [consete\]tur] sadip[scing\\] \\[elitr], sed [/diam]"
+    strOut1 = r"<Lorem\\> ipsum <\\> dolor \[sit\] amet <consete\]tur> sadip<scing\\> \\<elitr>, sed </diam>"
+ 
+    regex = r"(?P<prefix>^|[^\\](\\\\)*)\[(?P<slash>/?)(?P<expression>(.*?[^\\])??(\\\\)*)\]"
+    subst = r"\g<prefix><\g<slash>\g<expression>>"
+    
+    result = re.sub(regex, subst, strIn1)
+    
+    print(result)
+    
+    assert result == strOut1
+
 
 def test_convert_simple_line():
     """Checks conversion of the simplest tags."""
