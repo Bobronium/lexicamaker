@@ -17,15 +17,17 @@ General:
 ~~~~~~~~
 
 ``{{, }}``
-comment, for example, ``{{this is a comment}}``
+comment, for example, ``{{this is a comment}}`` but single ``{, }`` are literals in bodies only, but are special in headwords
+``#``
+preprocessor directive
 
-Entry headword:
+Entry headwords:
 ~~~~~~~~~~~~~~~
 
 ``{, }``
-unsorted part of a headword, for example, ``{to }have``, ``CO{[sub]}2{[/sub]}-Laser``
+unsorted part of a headword, for example, ``{to }have``, ``CO{[sub]}2{[/sub]}-Laser``, in body are literals
 ``(, )``
-optional part of a headword, for example, ``convert(ing)``
+optional part of a headword, for example, ``convert(ing)``, in body are literals
 ``\``
 backslash to use the special symbols ``{}()@~^`` in the headword, for example, ``\{``, ``\@``, ``\~``
 
@@ -36,6 +38,14 @@ Entry body:
 subentry
 ``~, ^~``
 retyped the headword
+``[, ]``
+tags, but double ``[[`` is treated as single non-tag symbol ``[`` i.e is equivalent to ``\[``
+``\``
+backslash to use the special symbols ``{}()@~^`` in the body, for example, ``\{``, ``\@``, ``\~``
+``<<, >>``
+referencing
+``[[, ]]``
+treated as single non-tag symbol ``[, ]`` but should not followed by a tag without a space
 
 Tags
 ----

@@ -3,6 +3,16 @@
 
 import re
 
+def process_escape_char(string, encode=True):
+    """ Substitutes escaped characters like '\\[' by the escape code '\\x5b' and back by single character '['. Also escapes the HTML special characters '&', '\"', '>', and '<'. """
+    
+    if encode:
+        string = re.sub(r'([&><])', r'\\\\\1', string)
+        return re.sub(r'\\(.)', lambda match: r'\x%02x' % ord(match.expand(r'\1')), string)
+    else:
+        return re.sub(r'\\x([0-9a-f]{2})', lambda match: chr(int(match.expand(r'\1'), 16)), string)
+
+
 def convertDSLstring(string):
     """ Processing the string by substitution of every known DSL tag by XML tag or calling the corresponding __parse_tag__ function """
 
@@ -26,7 +36,7 @@ def convertDSLstring(string):
                         r'\[/c\]'               : r'</font>',
                         r'\[sub\]'  : r'<sub>', r'\[/sub\]'  : '</sub>',
                         r'\[sup\]'  : r'<sup>', r'\[/sup\]'  : '</sup>',
-                        r'\[\'\]'   : '', r'\[/\'\]'    : '\u0301',
+                        r'\[\'\]'   : r'<font color="red">', r'\[/\'\]'    : '</font>',
                         
                         # TYPE II TAGS: call a function instead of the substitution pattern, can process text between tags.
                         # Downside is that opening and closing tags should be in the same line.
@@ -52,6 +62,24 @@ def convertDSLstring(string):
     for tag in DSLtoXMLmapping:
         string = re.sub(tag, DSLtoXMLmapping[tag], string)
 
+    # Make sure that a line is treated as a paragraph.
+    # Either the whole line is wrapped in <div>,
+    # or if there is any new paragraph <div>s in the line,
+    # wrap the free beginning and ending of the line in <div>s
+
+    print(string, '\n')
+    stringSplit = re.split(r'(<div(?: [^<>]+)*?>|</div>)', string)
+    if len(stringSplit) == 1:
+        string = r'<div>' + string + r'</div>'
+    else:
+        for i in [0,-1]:
+            if stringSplit[i]:
+                stringSplit[i] = r'<div>' + stringSplit[i] + r'</div>'
+        string = ''.join(stringSplit)
+    
+
+    #string = re.sub(r'(^.+?)(?:(<div[ >])|$)', r'<div>\1</div>', string)
+    print(string)
     return string
 
 def indexDSLstring(string):
@@ -207,6 +235,8 @@ def __makeID__(string):
 def processDSLbodyline(string):
     """ Processing the line by calling convertDSLstring() and wrapping free parts as paragraphs by <div>s. """
 
+    string = process_escape_char(string, True)
+    
     # We presume that indexing tags are opening and closing in the same bodyline.
     index = ''
     divTag = [r'<div>', r'</div>']
@@ -230,17 +260,19 @@ def processDSLbodyline(string):
     # wrap the free beginning and ending of the line in <div>s
 
     # it should be not always precise if there are numerous paragraphs in one bodyline
-    contentSplit = re.split(r'(<div(?: [^<>]+)*>|</div>)',content)
-    if len(contentSplit) == 1:
-        content = divTag[0] + content + divTag[1]
-    else:
-        for i in [0,-1]:
-            if contentSplit[i]:
-                contentSplit[i] = divTag[0] + contentSplit[i] + divTag[1]
-        content = ''.join(contentSplit)
+    #contentSplit = re.split(r'(<div(?: [^<>]+)*>|</div>)',content)
+    #if len(contentSplit) == 1:
+    #    content = divTag[0] + content + divTag[1]
+    #else:
+    #    for i in [0,-1]:
+    #        if contentSplit[i]:
+    #            contentSplit[i] = divTag[0] + contentSplit[i] + divTag[1]
+    #    content = ''.join(contentSplit)
     #for i, subString in list(enumerate(stringSplit))[0::2]:
     #    stringSplit[i] = '<div>' + subString + '</div>'
 
+    content = process_escape_char(content, False)
+    index = process_escape_char(index, False)
     # return resulting line
     return (content, index)
 
