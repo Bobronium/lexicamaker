@@ -32,6 +32,26 @@ def test_escaping_pattern():
     
     assert result == strOut1
 
+def test_extag_pattern():
+    """The test of how the pattern works for both single and paired tags."""
+    
+    import re
+    strIn1  = r"Lorem [ipsum] dolor [/ipsum] sit [amet x=y] consetetur [sadipscing] elitr, sed [diam] [/sadipscing] nonumy"
+    strOut1 = r"Lorem <ipsum>:' dolor ' dolor </ipsum>:'' sit <amet x=y>:'' consetetur <sadipscing>:' elitr, sed [diam] ' elitr, sed <diam>:'' </sadipscing>:'' nonumy"
+    
+    #regex = r"\[(?P<tag>\w+)(?P<params>\s.*?)??\]"
+    #subst = r"<\g<tag>\g<params>>"
+    regex = r"\[(?P<slash>/?)(?P<tag>\w+)(?P<params>\s.*?)??\](?=((?P<content>.*?)\[/(?P=tag)\])?)"
+    subst = r"<\g<slash>\g<tag>\g<params>>:'\g<content>'"
+
+    
+    result = re.sub(regex, subst, strIn1)
+    
+    print(strIn1)
+    print(result)
+    
+    assert result == strOut1
+
 
 def test_unicode_escaping():
     strIn1  = r"Lorem \[ipsum\] <dolor>"
