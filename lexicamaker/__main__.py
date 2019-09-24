@@ -36,12 +36,12 @@ class IOBridge:
                                     help="Use FILE as abbreviations file")
         subgroup_abrv.add_argument('--no-abbreviations', dest='abbreviationsFile', action='store_false',
                                     help="Ignore abbreviations files")
-        group.add_argument('--name', metavar='NAME', dest='dictionaryName', help="set dictionary name")
-        subgroup_media = group.add_mutually_exclusive_group()
-        subgroup_media.add_argument('--no-media', action='store_true', dest='media',
-                                    help="Skip media entries")
-        subgroup_media.add_argument('--media', metavar='TYPE', choices=['wav', 'mp3', 'm4a', 'aac'],
-                                    help="Change media type to TYPE. Supported formats are \'wav\', \'mp3\', \'m4a\', and \'aac\'")
+                                    #group.add_argument('--name', metavar='NAME', dest='dictionaryName', help="set dictionary name")
+                                    #subgroup_media = group.add_mutually_exclusive_group()
+                                    #subgroup_media.add_argument('--no-media', action='store_true', dest='media',
+                                    #help="Skip media entries")
+                                    #ubgroup_media.add_argument('--media', metavar='TYPE', choices=['wav', 'mp3', 'm4a', 'aac'],
+                                    #help="Change media type to TYPE. Supported formats are \'wav\', \'mp3\', \'m4a\', and \'aac\'")
         group.add_argument('--encoding', metavar='ENCODING', default='utf-16', choices=['utf-8', 'utf-16', 'utf-16le', 'utf-16be'],
                                     help="Set DSL dictionary encoding, suppored encodings are \'utf-8\' and \'utf-16\' (default). If in latter encoding the Byte Order Mark is is missing use \'utf-16le\' or \'utf-16be\'.")
         parser.add_argument('--version', action='version', version="lexicamaker v%s" % __version__ ) #"%(prog)s v{}".format(__version__))
