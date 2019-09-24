@@ -3,6 +3,52 @@
 
 import re
 
+DSLtags = {
+        # TYPE I TAGS: text-independent, one can map open and closing tags separately.
+        # It is useful if opening and closing tags are not in the same string.
+        # For example: here it's better to match [m] tags separately, while closing tag [/m] can be in the different line
+
+        r'\[m\]'                  : r'<div>',
+        # here \d stays for decimal digit, it's [0-9] and in case of Unicode other digit characters
+        r'\[m(?P<indent>\d)\]' : r'<div class="m\g<indent>">',
+        r'\[/m\]'                 : r'</div>',
+        r'\[br\]'   : r'<br />',
+        r'\[\*\]'   : r'<span d:priority="2">',
+        r'\[/\*\]'  : r'</span>',
+        r'\[b\]'    : r'<b>', r'\[/b\]'  : r'</b>',
+        r'\[i\]'    : r'<i>', r'\[/i\]'  : r'</i>',
+        r'\[u\]'    : r'<u>', r'\[/u\]'  : r'</u>',
+        # here \w stays for word characters, it's [a-zA-Z0-9_] and in case of Unicode most characters that can be part of a word in any language
+        r'\[c\]'                : r'<font color="green">',
+        r'\[c (?P<color>\w+)\]' : r'<font color="\g<color>">',
+        r'\[/c\]'               : r'</font>',
+        r'\[sub\]'  : r'<sub>', r'\[/sub\]'  : '</sub>',
+        r'\[sup\]'  : r'<sup>', r'\[/sup\]'  : '</sup>',
+        r'\[\'\]'   : r'<font color="red">', r'\[/\'\]'    : '</font>',
+ 
+        r'\[s\]'    : '', r'\[/s\]'     : '',
+        r'<<'       : '', r'>>'         : '',
+        r'\[ref\]'                             : '',
+        r'\[ref dict="(?P<dname>[\w\s]+)"\]'   : '',
+        r'\[/ref\]'                            : '',
+        r'\[url\]'  : '', r'\[/url\]'   : '',
+
+        # TYPE II TAGS: call a function instead of the substitution pattern, can process text between tags.
+        # Downside is that opening and closing tags should be in the same line.
+        # In case they isn't one has to substitute free dangling tags by empty string afterwards
+        
+        r'\[ex\](?P<content>)\[/ex\]'       : r'\g<content>',
+        r'\[trn\](?P<content>)\[/trn\]'     : r'\g<content>',
+        r'\[com\](?P<content>)\[/com\]'     : r'\g<content>',
+        r'\[!trs\](?P<content>)\[/!trs\]'     : r'\g<content>',
+        
+        r'\[p\]'    : r'<font color="green">',
+        r'\[/p\]'   : r'</font>',
+        r'\[t\]'    : r'<span d:pr="1">',
+        r'\[/t\]'   : r'</span>'
+
+}
+
 def process_escape_char(string, encode=True):
     """ Substitutes escaped characters like '\\[' by the escape code '\\x5b' and back by single character '['. Also escapes the HTML special characters '&', '\"', '>', and '<'. """
     
