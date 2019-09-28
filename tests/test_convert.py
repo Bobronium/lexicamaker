@@ -16,21 +16,16 @@ def setup_function(function):
     """Provides info on the failed function."""
     print("Output from %s" % function)
 
-def test_escaping_pattern():
-    """The test of how the pattern checks escaping."""
-    
-    import re
-    strIn1  = r"[Lorem\\] ipsum [\\] dolor \[sit\] amet [consete\]tur] sadip[scing\\] \\[elitr], sed [/diam]"
-    strOut1 = r"<Lorem\\> ipsum <\\> dolor \[sit\] amet <consete\]tur> sadip<scing\\> \\<elitr>, sed </diam>"
- 
-    regex = r"(?P<prefix>^|[^\\](\\\\)*)\[(?P<slash>/?)(?P<expression>(.*?[^\\])??(\\\\)*)\]"
-    subst = r"\g<prefix><\g<slash>\g<expression>>"
-    
-    result = re.sub(regex, subst, strIn1)
-    
-    print(result)
-    
-    assert result == strOut1
+
+def test_unicode_escaping():
+    strIn1  = r"Lorem \[ipsum\] <dolor>"
+    strOut1 = r"Lorem \x5bipsum\x5d \x5c<dolor\x5c>"
+    strOut2 = r"Lorem [ipsum] \<dolor\>"
+
+    assert process_escape_char(strIn1, True) == strOut1
+
+    assert process_escape_char(strOut1, False) == strOut2
+
 
 def test_extag_pattern():
     """The test of how the pattern works for both single and paired tags."""
@@ -52,15 +47,6 @@ def test_extag_pattern():
     
     assert result == strOut1
 
-
-def test_unicode_escaping():
-    strIn1  = r"Lorem \[ipsum\] <dolor>"
-    strOut1 = r"Lorem \x5bipsum\x5d \x5c<dolor\x5c>"
-    strOut2 = r"Lorem [ipsum] \<dolor\>"
-
-    assert process_escape_char(strIn1, True) == strOut1
-
-    assert process_escape_char(strOut1, False) == strOut2
 
 
 
