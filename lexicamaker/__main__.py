@@ -6,7 +6,7 @@ import os, sys, re, shutil
 import argparse
 #from lexicamaker import __version__
 from . import __version__
-from . import dsl
+#from . import dsl
 
 
 class IOBridge:
@@ -18,7 +18,6 @@ class IOBridge:
     def __set_parser__(parser):
         """This function is called once for shared parser object and sets the processing of the command line arguments"""
         #parser.add_argument('dictionaryFile', metavar='DSL_FILE', type=argparse.FileType('r', encoding='utf-16le'), help="a DSL dictionary file")
-        #parser.add_argument('dictionaryFile', metavar='DSL_FILE', help="a DSL dictionary file")
         parser.add_argument('dictionaryFile', metavar='DSL_FILE', help="a DSL dictionary file")
         subgroup_opath = parser.add_mutually_exclusive_group()
         subgroup_opath.add_argument('outputDictionaryPath', metavar='OUTPUT_DIR', nargs='?', default=os.getcwd(),
@@ -36,7 +35,7 @@ class IOBridge:
                                     help="Use FILE as abbreviations file")
         subgroup_abrv.add_argument('--no-abbreviations', dest='abbreviationsFile', action='store_false',
                                     help="Ignore abbreviations files")
-                                    #group.add_argument('--name', metavar='NAME', dest='dictionaryName', help="set dictionary name")
+        group.add_argument('--name', metavar='NAME', dest='dictionaryName', help="set dictionary name")
                                     #subgroup_media = group.add_mutually_exclusive_group()
                                     #subgroup_media.add_argument('--no-media', action='store_true', dest='media',
                                     #help="Skip media entries")
