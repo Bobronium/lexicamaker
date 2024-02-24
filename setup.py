@@ -15,7 +15,7 @@ setup(name='lexicamaker',
                    'Programming Language :: Python :: 3.7',
                    'Topic :: Text Processing :: Linguistic',
                    ],
-  keywords='dsl apple dictionary'
+  keywords='dsl apple dictionary',
   url='http://github.com/lnxk/adsmaker',
   author='Svintuss',
   author_email='svintuss@gmail.com',
