@@ -22,7 +22,7 @@ setup(name='lexicamaker',
   license='MIT',
   packages=['lexicamaker'],
   zip_safe=True,
-  include_package_data=True
+  include_package_data=True,
   entry_points = {
     'console_scripts': ['adsmaker=lexicamaker.__main__:main'],
   }
